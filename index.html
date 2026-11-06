@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:">
+<title>How Life Begins</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#29223d;background:#fff8f1;font:600 clamp(17px,1.65vw,24px)/1.35 ui-rounded,"Trebuchet MS",system-ui,sans-serif}header,main,.controls{width:min(1420px,100%);margin:auto;padding:12px clamp(14px,3vw,44px)}header{display:grid;grid-template-columns:1fr auto;align-items:center;gap:6px 20px}h1,h2,p{margin:0}h1{font-size:clamp(25px,3vw,43px)}h2{font-size:clamp(24px,3vw,42px)}progress{grid-column:1/-1;width:100%;height:12px;accent-color:#7250ad}.layout{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;align-items:start}.art,.lesson{border-radius:24px;background:white;border:2px solid #e9ddf1;overflow:hidden}.art svg{display:block;width:100%;background:#f9dbe8}.artbar,.lesson{padding:14px 18px}.artbar{display:flex;align-items:center;justify-content:space-between;gap:10px}.lesson p{margin-top:8px}.vocab{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.word{background:#e3f8ed;border-radius:16px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px}.word svg{width:35px;height:30px}.quiz{margin-top:16px}.quiz h3{font-size:1em;margin:0 0 8px}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.choices button{padding:6px;background:#edf6ff;border-color:#b9cfee;font-size:clamp(14px,1.4vw,20px)}.choices svg{width:100%;height:clamp(46px,7vw,94px);display:block}.choices .correct{background:#d6f5df;border-color:#39805a}.choices .retry{background:#fff1dc;border-color:#aa6841}button{font:inherit;color:inherit;border:2px solid #d1bce5;background:#f2e9ff;border-radius:15px;min-height:52px;padding:6px 16px;cursor:pointer}button:disabled{opacity:.52;cursor:default}button:focus-visible{outline:4px solid #34216a;outline-offset:3px}.controls{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:12px}.controls button{min-height:60px}footer{position:fixed;bottom:0;left:0;right:0;background:#fff8f1;border-top:2px solid #eadfec}main{padding-bottom:106px}#next{background:#67449e;color:white}#feedback,#done,#audio{font-size:.87em}#done{color:#286345}#caption{font-size:.85em}.float{animation:float 2.8s ease-in-out infinite}.tail{transform-origin:32px 0;animation:wiggle .85s ease-in-out infinite alternate}.wave{transform-origin:-22px 6px;animation:wiggle .55s ease-in-out 4 alternate}.swim{animation:swim 3.6s ease-in-out both}.approach{animation:approach 3.3s ease-out both}.twinkle{animation:twinkle 2.4s ease-in-out infinite}.appear{animation:appear 1.5s ease-out both}.ribbon{stroke-dasharray:190;animation:reach 2.6s ease-out both}.grow{animation:grow 3.5s ease-in-out both}.join{animation:approach 1.6s ease-in-out both}.split{animation:split 1s ease-out both;transform-box:fill-box;transform-origin:center}.celebrate{animation:twinkle .65s ease-in-out 3}@keyframes float{50%{transform:translateY(-8px)}}@keyframes wiggle{from{rotate:-10deg}to{rotate:10deg}}@keyframes swim{0%,35%{translate:-65px}100%{translate:42px}}@keyframes approach{from{translate:-70px}to{translate:0}}@keyframes twinkle{50%{opacity:.5}}@keyframes appear{from{opacity:0}to{opacity:1}}@keyframes reach{from{stroke-dashoffset:190}to{stroke-dashoffset:0}}@keyframes grow{from{transform:scale(.54)}to{transform:scale(1)}}@keyframes split{from{transform:translateX(var(--from))}to{transform:translateX(0)}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}@media(max-width:700px){.layout{grid-template-columns:1fr}.controls button{padding:4px}}
+.zh{display:block;font-size:.85em;color:#4d3d68;font-weight:600}.word .zh{display:inline;margin-inline-start:.25em}#story p+p{margin-top:.5em}</style></head>
+<body>
+<header><h1>How Life Begins</h1><span id="counter"></span><progress id="progress" max="7" aria-label="Story progress"></progress></header>
+<main><div class="layout"><section class="art" aria-label="Story illustration"><div id="picture"></div><div class="artbar"><span id="caption" role="status"></span><button id="replay" type="button">↻ Replay</button></div></section>
+<section class="lesson" aria-labelledby="title"><h2 id="title" tabindex="-1"></h2><div id="story"></div><div id="vocab" class="vocab" aria-label="Vocabulary"></div><p id="audio" role="status"></p><section id="quiz" class="quiz" hidden><h3 id="question"></h3><div id="choices" class="choices" role="group" aria-labelledby="question"></div><p id="feedback" role="status"></p></section><p id="done" role="status"></p></section></div></main>
+<footer><nav class="controls" aria-label="Story controls"><button id="back" type="button">← Back</button><button id="read" type="button">Read aloud</button><button id="next" type="button">Next →</button></nav></footer>
+<script>
+'use strict';
+const scenes = [
+ ['Meet Bub',['“Hi! I’m Bub. I love to swim. Come swim with me!”','Bub is a sperm cell.'],['sperm cell'],'Who is Bub?',['Bub','Ellie','a baby'],'Bub is the little blue sperm cell.','Look for the little blue cell with a tail.'],
+ ['Meet Friends',['Bub meets two friends. They swim together.'],['sperm cell'],'How many sperm cells do you see?',['three','one','two'],'Bub and his friends make three.','Count Bub and his two friends.'],
+ ['A Bright Light',['Bub and his friends see a bright light. “What is that?” asks Bub.'],['light'],'What do Bub and his friends see?',['a soft light','a leaf','a cloud'],'They see a soft light ahead.','Look for the bright glow ahead of Bub and his friends.'],
+ ['Meet Ellie',['This is Ellie. Ellie is an egg cell. She is big and round.'],['egg cell'],'Which one is the egg cell?',['Ellie','Bub','Bal'],'Ellie is the big, round egg cell.','Look for the big, round cell.'],
+ ['Bub Says Hello',['Bub swims near Ellie. “Hello! I’m Bub,” he says.'],['egg cell'],'Who does Bub say hello to?',['Ellie','Bal','a baby'],'Bub says hello to Ellie.','Look for the big, round cell next to Bub.'],
+ ['A Little Light',['Ellie gets brighter. In our story, a little light reaches out like a hand.'],['light'],'What reaches toward Bub in the story?',['a little light','a tail','a leaf'],'A little light reaches toward Bub.','Look for the glowing ribbon from Ellie.'],
+ ['A New Beginning',['A sperm cell and an egg cell meet inside the mother’s body.','They join and make one new cell.','The baby grows in the uterus.','After many months, the baby is born.'],['uterus','born'],'What do the egg cell and sperm cell make when they join?',['one new cell','two cells','a baby in a blanket'],'They make one new cell.','Look at what forms when the two cells join.']
+];
+const ui = Object.fromEntries([...document.querySelectorAll('[id]')].map(el=>[el.id,el]));
+const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const svg=(body,view='0 0 600 340')=>`<svg viewBox="${view}" aria-hidden="true" focusable="false">${body}</svg>`;
+const at=(x,y,body,scale=1)=>`<g transform="translate(${x} ${y}) scale(${scale})">${body}</g>`;
+const dot=(x,y,r,c)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`;
+const star=(x,y,s=1)=>at(x,y,'<path d="M0 -12 Q2 -2 12 0 Q2 2 0 12 Q-2 2 -12 0 Q-2 -2 0 -12" fill="#fff9cf" stroke="#bb803d" stroke-width="1"/>',s);
+const face=(size=1)=>at(0,0,dot(-9,-4,3,'#392c50')+dot(9,-4,3,'#392c50')+dot(-15,4,3.7,'#f38fac')+dot(15,4,3.7,'#f38fac')+'<path d="M-5 4Q0 11 5 4" fill="none" stroke="#392c50" stroke-width="2.5" stroke-linecap="round"/>',size);
+function sperm(bal=false,story=true,wave=false){
+ const fill=bal?'#bdebd4':'#bce3ff', edge=bal?'#397761':'#426e9e';
+ return `<g transform="scale(-1 1)"><path class="${story?'tail':''}" d="M24 0 C42 -21 49 20 69 3" fill="none" stroke="${edge}" stroke-width="5" stroke-linecap="round"/><ellipse rx="28" ry="22" fill="${fill}" stroke="${edge}" stroke-width="3"/>${story?face():''}${wave?'<path class="wave" d="M-21 10Q-34 8 -38 -6m0 0 -2 -5m2 5 4 -4" fill="none" stroke="#426e9e" stroke-width="3" stroke-linecap="round"/>':''}</g>`;
+}
+const egg=(story=true)=>'<circle r="49" fill="#ffdeed" stroke="#a95e88" stroke-width="3"/><circle r="39" fill="#ffedf5" stroke="#e6a6c6" stroke-width="2"/>'+(story?face(1.65)+star(-34,-32)+star(33,-31,.7):dot(0,0,13,'#d88ab5'));
+const cell=()=>'<circle r="39" fill="#dfd0ff" stroke="#7860a6" stroke-width="3"/><circle r="28" fill="#f1e8ff"/><circle r="11" fill="#b098dc"/>';
+const baby=()=>'<path d="M-34 -9Q-44 22 -14 51Q1 63 16 50Q45 24 33 -9Z" fill="#c8e8ff" stroke="#597fa6" stroke-width="3"/><path d="M-32 8L25 37M32 8L-20 44" stroke="#597fa6" stroke-width="3" fill="none"/><circle cy="-18" r="24" fill="#ffd5b8" stroke="#9f695a" stroke-width="2"/>'+at(0,-16,face(.76));
+const womb=(child='')=>`<path d="M-94 -64Q-83 -114 -12 -109Q60 -102 72 -48Q83 -14 51 19Q26 40 30 80L4 87Q4 57 -27 39Q-111 20 -94 -64Z" fill="#ef9cb0" stroke="#97536c" stroke-width="4"/><path d="M-77 -58Q-65 -93 -15 -92Q45 -87 53 -46Q64 -17 37 10Q8 32 15 67Q8 37 -29 23Q-91 7 -77 -58Z" fill="#ffe2eb"/>${child}`;
+const fetus=()=>'<circle cx="12" cy="-29" r="18" fill="#ffd1b5" stroke="#ad6d60" stroke-width="2"/><path d="M0 -17Q-24 -18 -28 0Q-33 19 -7 24Q9 27 17 15Q22 6 13 5Q6 4 2 12Q-9 11 -10 4Q4 5 8 -5" fill="#ffd1b5" stroke="#ad6d60" stroke-width="2" stroke-linecap="round"/><path d="M19 -26q4 3 7 0" fill="none" stroke="#87574c" stroke-width="2"/>';
+function icon(label){
+ const art={
+  Bub:sperm(),Bal:sperm(true),Ellie:at(0,0,egg(),.76),'a baby':at(0,0,baby(),.72),
+  one:at(0,0,sperm(),.82),two:at(-22,-13,sperm(),.58)+at(21,16,sperm(true),.58),
+  three:at(-24,-23,sperm(),.48)+at(19,0,sperm(true),.48)+at(-24,23,sperm(true),.48),
+  'a soft light':dot(0,0,30,'#ffe8a2')+star(0,0,2),'a little light':dot(0,0,30,'#ffe8a2')+star(0,0,2),
+  'a leaf':'<path d="M-26 22Q-42 -24 29 -31Q32 19 -26 22Z" fill="#a8d9a1" stroke="#437a52" stroke-width="3"/><path d="M-33 29L16 -17" stroke="#437a52" stroke-width="3"/>',
+  'a cloud':'<path d="M-35 21Q-53 2 -32 -9Q-26 -37 -3 -25Q18 -39 28 -13Q51 -9 43 12Q39 24 22 22Z" fill="#e8f4ff" stroke="#6585aa" stroke-width="3"/>',
+  'a tail':'<path d="M-40 6Q-15 -33 7 4T40 0" stroke="#426e9e" stroke-width="7" stroke-linecap="round" fill="none"/>',
+  'one new cell':at(0,0,cell(),.78),'two cells':at(-22,0,cell(),.52)+at(22,0,cell(),.52),
+  uterus:at(4,4,womb(),.39)
+ };
+ return svg(art[({'sperm cell':'Bub','egg cell':'Ellie',light:'a soft light',born:'a baby','a baby in a blanket':'a baby'})[label]||label],'-68 -49 136 98');
+}
+const glow=(x,y,r)=>`<circle class="twinkle" cx="${x}" cy="${y}" r="${r}" fill="url(#glow)"/>`;
+const defs='<defs><radialGradient id="glow"><stop stop-color="#fffbe8"/><stop offset=".42" stop-color="#fff1ba" stop-opacity=".93"/><stop offset="1" stop-color="#fff1ba" stop-opacity="0"/></radialGradient><linearGradient id="sky" x2="1" y2="1"><stop stop-color="#f7cadd"/><stop offset=".55" stop-color="#ffe7d6"/><stop offset="1" stop-color="#dedaff"/></linearGradient></defs>';
+function storyArt(i){
+ const bub=(x,y,cls,wave=false)=>at(x,y,`<g class="${cls}"><g class="float">${at(0,0,sperm(false,true,wave),1.35)}</g></g>`);
+ const bal=(x,y,cls)=>at(x,y,`<g class="${cls}">${at(0,0,sperm(true),1.35)}</g>`);
+ const ellie=(x,y)=>at(x,y,`<g class="float">${at(0,0,egg(),1.35)}</g>`);
+ const light=glow(438,163,136);
+ const figures=[
+  bub(303,164,'swim',true),
+  bub(230,113,'swim')+bal(330,177,'swim')+bal(238,240,'swim'),
+  bub(176,131,'approach')+bal(212,213,'float')+bal(135,260,'float')+`<g class="appear">${light}</g>`,
+  bub(163,163,'float')+`<g class="appear">${light+ellie(415,161)}</g>`,
+  bub(273,172,'approach',true)+light+ellie(426,164),
+  light+ellie(419,163)+bub(220,171,'float')+'<path class="ribbon" d="M360 164Q320 138 287 171Q266 190 243 173" fill="none" stroke="#fff9c5" stroke-width="14" stroke-linecap="round"/>'+star(260,173,.85),
+  light+ellie(419,163)+bub(220,171,'float')
+ ];
+ return defs+'<rect width="600" height="340" fill="url(#sky)"/><path d="M0 64Q159 -10 337 54T600 28V0H0ZM0 270Q125 210 288 286T600 256V340H0Z" fill="#e6a4c6" opacity=".35"/><g class="twinkle">'+star(95,86)+star(509,72,.75)+star(115,258,.7)+star(482,265)+star(295,54,.65)+dot(543,204,5,'#fff4f6')+'</g>'+figures[i];
+}
+function scienceArt(step){
+ const child=at(-9,-29,`<g class="grow">${fetus()}</g>`);
+ const panels=[
+  storyArt(6),
+  at(337,162,egg(false))+at(270,162,'<g class="join">'+sperm(false,false)+'</g>',.68),
+  at(300,162,cell()),
+  at(311,171,womb(child),1.19),
+  at(300,155,baby(),1.55)
+ ];
+ if(step===0)return panels[0];
+ return '<rect width="600" height="340" fill="#f1f5ff"/><rect x="18" y="18" width="564" height="304" rx="25" fill="#fff" stroke="#d9ddf3" stroke-width="2"/><g class="appear">'+panels[step]+'</g>';
+}
+const scienceCaptions=['From story to science','An egg cell and a sperm cell meet.','One new cell','The baby grows in the uterus.','The baby is born.'];
+const storyCaptions=['Bub swims.','Bub swims with his friends.','A light shines ahead.','Ellie is big and round.','Bub waves to Ellie.','A little light reaches toward Bub.'];
+const chinese = {
+ "Meet Bub": "認識 Bub",
+ "“Hi! I’m Bub. I love to swim. Come swim with me!”": "「嗨！我是 Bub。我喜歡游泳。來和我一起游吧！」",
+ "Bub is a sperm cell.": "Bub 是一個精子。",
+ "sperm cell": "精子",
+ "Who is Bub?": "誰是 Bub？",
+ "Bub": "Bub",
+ "Ellie": "Ellie",
+ "a baby": "寶寶",
+ "Bub is the little blue sperm cell.": "Bub 是有尾巴的藍色小精子。",
+ "Look for the little blue cell with a tail.": "找找有尾巴的藍色小細胞。",
+ "Meet Friends": "認識朋友",
+ "Bub meets two friends. They swim together.": "Bub 遇到兩位朋友。他們一起游泳。",
+ "How many sperm cells do you see?": "你看到幾個精子？",
+ "three": "三個",
+ "one": "一個",
+ "two": "兩個",
+ "Bub and his friends make three.": "Bub 和朋友們一共有三個。",
+ "Count Bub and his two friends.": "數一數 Bub 和他的兩位朋友。",
+ "A Bright Light": "一道亮光",
+ "Bub and his friends see a bright light. “What is that?” asks Bub.": "Bub 和朋友們看到一道亮光。「那是什麼？」Bub 問。",
+ "light": "光",
+ "What do Bub and his friends see?": "Bub 和朋友們看到了什麼？",
+ "a soft light": "一道柔和的光",
+ "a leaf": "一片葉子",
+ "a cloud": "一朵雲",
+ "They see a soft light ahead.": "他們看到前方有一道柔和的光。",
+ "Look for the bright glow ahead of Bub and his friends.": "找找 Bub 和朋友們前方的亮光。",
+ "Meet Ellie": "認識 Ellie",
+ "This is Ellie. Ellie is an egg cell. She is big and round.": "這是 Ellie。Ellie 是一個卵子。她又大又圓。",
+ "egg cell": "卵子",
+ "Which one is the egg cell?": "哪一個是卵子？",
+ "Bal": "Bal",
+ "Ellie is the big, round egg cell.": "Ellie 是又大又圓的卵子。",
+ "Look for the big, round cell.": "找找又大又圓的細胞。",
+ "Bub Says Hello": "Bub 打招呼",
+ "Bub swims near Ellie. “Hello! I’m Bub,” he says.": "Bub 游到 Ellie 身邊。他說：「你好！我是 Bub。」",
+ "Who does Bub say hello to?": "Bub 跟誰打招呼？",
+ "Bub says hello to Ellie.": "Bub 跟 Ellie 打招呼。",
+ "Look for the big, round cell next to Bub.": "找找 Bub 身旁又大又圓的細胞。",
+ "A Little Light": "一小道光",
+ "Ellie gets brighter. In our story, a little light reaches out like a hand.": "Ellie 變得更亮了。在故事裡，一小道光像手一樣伸了出去。",
+ "What reaches toward Bub in the story?": "故事裡，是什麼伸向 Bub？",
+ "a little light": "一小道光",
+ "a tail": "一條尾巴",
+ "A little light reaches toward Bub.": "一小道光伸向 Bub。",
+ "Look for the glowing ribbon from Ellie.": "找找從 Ellie 那裡伸出來的發光絲帶。",
+ "A New Beginning": "新的開始",
+ "A sperm cell and an egg cell meet inside the mother’s body.": "一個精子和一個卵子在媽媽的身體裡相遇。",
+ "They join and make one new cell.": "它們結合，形成一個新的細胞。",
+ "The baby grows in the uterus.": "寶寶在子宮裡長大。",
+ "After many months, the baby is born.": "過了好幾個月，寶寶出生了。",
+ "uterus": "子宮",
+ "born": "出生",
+ "What do the egg cell and sperm cell make when they join?": "卵子和精子結合後，會形成什麼？",
+ "one new cell": "一個新細胞",
+ "two cells": "兩個細胞",
+ "a baby in a blanket": "裹著毯子的寶寶",
+ "They make one new cell.": "它們形成一個新的細胞。",
+ "Look at what forms when the two cells join.": "看看兩個細胞結合後，形成了什麼。",
+ "Bub swims.": "Bub 在游泳。",
+ "Bub swims with his friends.": "Bub 和朋友們一起游泳。",
+ "A light shines ahead.": "前方有一道亮光。",
+ "Ellie is big and round.": "Ellie 又大又圓。",
+ "Bub waves to Ellie.": "Bub 向 Ellie 揮手。",
+ "From story to science": "從故事看科學",
+ "An egg cell and a sperm cell meet.": "一個卵子和一個精子相遇。",
+ "One new cell": "一個新細胞",
+ "The baby grows in the uterus.": "寶寶在子宮裡長大。",
+ "The baby is born.": "寶寶出生了。",
+ "How Life Begins": "生命如何開始",
+ "↻ Replay": "重播",
+ "← Back": "上一幕",
+ "Read aloud": "朗讀英文",
+ "Next →": "下一幕",
+ "Finish": "完成",
+ "Story complete!": "故事結束了！",
+ "Read aloud is unavailable. You can read the story on screen.": "目前無法朗讀。你可以閱讀畫面上的故事。"
+};
+const translation = value => `<span class="zh" lang="zh-Hant-TW">${value}</span>`;
+const bilingual = (label, showChinese = index === 6) =>
+ showChinese && chinese[label] !== label ? label + translation(chinese[label]) : label;
+function showFeedback(correct){
+ const message = scenes[index][correct ? 5 : 6];
+ ui.feedback.innerHTML = (correct ? 'Yes! ' : 'Try again! ') + message
+  + (index === 6 ? translation((correct ? '答對了！' : '再試一次！') + chinese[message]) : '');
+}
+const answers=Array(7).fill(false);
+let index=0,timer,run=0,voiceRun=0;
+function stopSpeech(){
+ voiceRun++;
+ if('speechSynthesis' in window) window.speechSynthesis.cancel();
+ ui.audio.textContent='';
+}
+function updateNext(){
+ ui.next.disabled=!answers[index]||ui.quiz.hidden;
+}
+function reveal(){
+ ui.quiz.hidden=false;
+ updateNext();
+}
+function play(){
+ clearTimeout(timer);
+ const currentRun=++run;
+ ui.quiz.hidden=true;
+ updateNext();
+ if(index<6){
+  ui.picture.innerHTML=svg(storyArt(index));
+  ui.caption.innerHTML=bilingual(storyCaptions[index]);
+  if(motion.matches)reveal();
+  else timer=setTimeout(reveal,3650);
+  return;
+ }
+ const delays=[850,2200,2450,3950,1450];
+ function frame(step){
+  if(currentRun!==run)return;
+  ui.picture.innerHTML=svg(scienceArt(step));
+  ui.caption.innerHTML=bilingual(scienceCaptions[step]);
+  timer=setTimeout(step===scienceCaptions.length-1?reveal:()=>frame(step+1),delays[step]);
+ }
+ frame(0);
+}
+function render(focus=false){
+ stopSpeech();
+ const [title,lines,words,question,options]=scenes[index];
+ ui.counter.innerHTML=`Scene ${index+1} of 7`+(index === 6 ? translation('第 7 幕，共 7 幕') : '');
+ ui.progress.value=index+1;
+ ui.title.innerHTML=bilingual(title);
+ ui.story.replaceChildren(...lines.map(line=>Object.assign(document.createElement('p'),{innerHTML:bilingual(line)})));
+ ui.vocab.innerHTML=words.map(word=>`<span class="word">${icon(word)}${bilingual(word, index <= 3 || index === 6 || word === 'light')}</span>`).join('');
+ ui.question.innerHTML=bilingual(question);
+ ui.feedback.textContent='';
+ if(answers[index])showFeedback(true);
+ ui.done.textContent='';
+ ui.back.disabled=index===0;
+ ui.next.innerHTML=bilingual(index===6?'Finish':'Next →');
+ ui.back.innerHTML=bilingual('← Back');
+ ui.read.innerHTML=bilingual('Read aloud');
+ ui.replay.innerHTML=bilingual('↻ Replay');
+ const position=[1,2,0,2,1,0,2][index];
+ const ordered=options.slice(1);
+ ordered.splice(position,0,options[0]);
+ ui.choices.replaceChildren(...ordered.map(label=>{
+  const button=document.createElement('button');
+  button.type='button';
+  button.innerHTML=icon(label)+`<span>${bilingual(label)}</span>`;
+  if(answers[index]&&label===options[0])button.classList.add('correct');
+  button.onclick=()=>{
+   const correct=label===options[0];
+   if(correct)answers[index]=true;
+   for(const choice of ui.choices.children)choice.classList.remove('retry');
+   button.classList.toggle(correct?'correct':'retry',true);
+   showFeedback(correct);
+   if(correct){
+    const image=button.querySelector('svg');
+    image.classList.remove('celebrate');
+    image.getBoundingClientRect();
+    if(index===6 && !image.querySelector('.answer-stars')){
+     image.insertAdjacentHTML('beforeend',`<g class="answer-stars">${star(-44,-23)+star(43,-22)+star(42,23,.7)}</g>`);
+    }
+    image.classList.add('celebrate');
+   }
+   updateNext();
+  };
+  return button;
+ }));
+ play();
+ if(focus)ui.title.focus();
+}
+ui.back.onclick=()=>{if(index>0){index--;render(true);}};
+ui.next.onclick=()=>{
+ if(ui.next.disabled)return;
+ if(index===6){ui.done.innerHTML=bilingual('Story complete!');return;}
+ index++;
+ render(true);
+};
+ui.replay.onclick=play;
+ui.read.onclick=()=>{
+ stopSpeech();
+ const request=voiceRun;
+ const fallback=()=>{if(request===voiceRun)ui.audio.innerHTML=bilingual('Read aloud is unavailable. You can read the story on screen.');};
+ if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){fallback();return;}
+ const voices=window.speechSynthesis.getVoices().filter(voice=>voice.localService);
+ const voice=voices.find(voice=>/^en[-_]US$/i.test(voice.lang))||voices.find(voice=>/^en(?:[-_]|$)/i.test(voice.lang));
+ if(!voice){fallback();return;}
+ const line=new SpeechSynthesisUtterance(scenes[index][1].join(' '));
+ line.voice=voice;
+ line.lang=voice.lang;
+ line.rate=.84;
+ line.onerror=fallback;
+ window.speechSynthesis.speak(line);
+};
+render();
+</script></body></html>
